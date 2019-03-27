@@ -2,13 +2,13 @@
 """
 @author: Patrick Alves
 """
-
 from util.tabelas import LerTabelas
 from util.dados import DadosLDO
 from util.busca_erros import corrige_erros_estoque, busca_erros_prob
 from util.graficos import *
 from util.carrega_parametros import obter_parametros
 import modelos.fazenda as fz
+from util.argumentos import DadosArgumentos
 
 
 ###############################################################################
@@ -41,17 +41,25 @@ if __name__ == "__main__":
 # dicionário que armazena os parâmetros obtidos do arquivo "parametros.txt"
 parametros = obter_parametros()
 
-# Teto do RGPS de 2014 a 2017
-tetoInicialRGPS = [4390.24, 4663.75, 5189.82, 5531.31]
 
+# Os argumentos vem de uma planilha. Os dados são colhidos de forma automática
+argumentos = DadosArgumentos()
+dadosArgumentos = argumentos.get_argumentos()
 # Objeto que armazena dados da LDO de 2018
 ldo = DadosLDO()
 dadosLDO2018 = ldo.get_tabelas()
 
+# Teto do RGPS de 2014 a 2017
+#tetoInicialRGPS = [4390.24, 4663.75, 5189.82, 5531.31]
+# tomada dos dados
+tetoInicialRGPS = dadosArgumentos['tetoInicialRGPS'].iloc[:,0].tolist()
+### Incluída idade mínima
+# dadosArgumentos['idade_minima']['ApinUrbPisoM'][2023]
+
 #############################################################################
 
 # Cria uma lista com os anos a serem projetados
-ano_inicial = 2015
+ano_inicial = parametros['ano_inicial']
 ano_final = parametros['ano_final']
 periodo = list(range(ano_inicial, ano_final+1))
 parametros['periodo'] = periodo
@@ -66,7 +74,7 @@ parametros['aliquota_media'] = aliquotas_serie
 PIBs = dadosLDO2018['PIB Planilhas']
 
 ### Salário Mínimo de inicial 
-salario_minimo = 724.00     # Valor de 2014
+salario_minimo = parametros['salario_minimo']     # Valor de 2014
 
 # Salva parâmetros em variáveis locais - CORRIGIR
 produtividade = parametros['produtividade']

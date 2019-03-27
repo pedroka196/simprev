@@ -1,10 +1,7 @@
 # Este arquivo contém todos os parâmetros de projeção que serão utilizados pelo SimPrev
 
-### Período de projeção inicial
-ano_inicial = 2015
-
 ### Período de projeção 
-ano_final = 2060
+ano_final = 2075
 
 ### Ano de referência para cálculo das probabilidades
 # Anos disponíveis: 2012, 2013 e 2014
@@ -16,7 +13,6 @@ produtividade = 1.7
 ### Formalização
 # Taxa de aumento na formalização anual em %
 formalizacao = 0.0
-
 # Ano no qual a taxa de aumento na formalização para de ser aplicada
 ano_limite_formalizacao = 2025
 
@@ -28,12 +24,3 @@ tx_crescimento_urb = 0
 
 # Taxa de crescimento da taxa de Participação no Mercado de Trabalho  
 tx_crescimento_part = 0
-
-# Salário mínimo no momento inicial
-salario_minimo = 724.00
-
-# Inflação
-inflacao = 4.5
-
-# Percentual do Auxílio-acidente
-perc_aux_acidente = 0.5

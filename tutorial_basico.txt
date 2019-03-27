@@ -1,0 +1,111 @@
+Simprev.py é o arquivo pai. Ele importa: 
+
+util.tabelas import LerTabelas #### Classe para ler planilha do Excel
+util.dados import DadosLDO ###
+util.busca_erros import corrige_erros_estoque, busca_erros_prob
+util.graficos import *
+util.carrega_parametros import obter_parametros
+import modelos.fazenda as fz
+
+##### util.tabelas --- LerTabelas
+* Define o objeto para leitura de planilhas do excel (biblioteca pandas), define as ids a serem utilizadas, como IDs para tabelas do IBGE, da PNAD, e IDs de salário.
+* A função get_tabelas recebe o arquivo e uma lista de lista de planilhas para extrair.
+* * Há uma busca por dados no arquivo, com o uso das IDs, buscando em cada planilha.
+* * Retorna um dicionário com todas as tabelas.
+* A função get_clientela(self, beneficio) identifica e retorna a Clientela de um benefício (definido como uma lista com todos os benefícios, utilizando o mesmo padrão do simulador da Fazenda)
+* A função get_id_segurados(self, beneficio) segurados identifica e retorna o Segurado de um benefício
+* A função def get_significado_sigla(self, chave) retorna o significado de uma sigla, usando um dicionário dentro da função.
+
+##### util.dados DadosLDO
+* Definição classe
+* * Define o arquivo como a planilha 'dados/TabelasLDO2018.xlsx' e importa os arquivos usando a pandas. - dados
+* * Define o período como uma lista de 2015 a 2061 - periodo
+* * Define os valores da taxa de crescimento do salário mínimo de 2015 a 2060 (%) - ValoresTxCrescimentoSalMin
+* * Define o reajuste do salário mínimo de 2015 a 2018 (imagino que nominal) - reajuste_2015_2018
+* * Define a inflação de 2015 a 2018 - inflacao_2015_2018
+* * Define uma alíquota média - ALIQUOTA_MED
+* * Define a inflação - INFLACAO
+* * Define o Reajuste de 2015 a 2060 (usa o valor da INFLACAO) - ValoresTxReajusteBeneficios
+* * Define a inflação de 2015 a 2060 - TxInflacao
+* * Define a taxa da massa salarial de 2015 a 2060 - TxCresMassaSalContribuintes
+* * Define as alíquotas médias de 2014 a 2060 - aliquotasPlanilhasMF
+* * Define os PIBs de 2014 a 2016 - PIBs
+* * Define a receita de 2014 a 2016 - receitas_planilha
+* * Define as receitas de 2013 a 2015 AEPS - receitas_aeps
+* * * (fonte: AEPS 2015 - Tabelas 42.1, 42.4, 42.5 (BENEFÍCIOS)
+* * Define as despesas de 2013 a 2015 AEPS - despesas_aeps
+* * * (fonte: AEPS 2015 - Tabelas 42.1, 42.4, 42.5 (BENEFÍCIOS)
+* * Define as aposentadorias de 2013 a 2015 AEPS - aposentadorias_aeps
+* * * (fonte: AEPS 2015 - Tabela C.1)
+* * Define as pensões de 2013 a 2015 AEPS - pensoes_aeps
+* * * (fonte: AEPS 2015 - Tabela C.1)
+* A função get_tabelas(self) cria um dicionário que armazena dados
+* * Armazena os dados definidos acima, usando como índice o valor do ano.
+* * Importa as tabelas 6.1 e 6.2 do arquivo dados/TabelasLDO2018.xlsx.
+* * * Os dados importados são corrigido, já que estão em milhões na tabela
+* * Armazena os dados AEPS
+
+##### util.busca_erros corrige_erros_estoque
+* Importa a função corrige_erros_estoque(estoques, concessoes, cessacoes, logs), que identifica dados de estoque inconsistentes e retorna 
+* * Identifica dados de estoque inconsistentes.
+* * Verifica se existe benefícios nos dicionários de estoques, concessões e cessações
+* * Identifica idades em que o número de Concessões é maior que o Estoque do ano e idade seguinte
+* * Corrige o estoque para as idades onde o erro foi encontrado e vai para a próxima observação
+* * Retorna um dicionário de estoque.
+
+##### util.busca_erros busca_erros_prob
+* Define a função busca_erros_prob(probabilidades, logs, corrigir=False) que busca e corrige probabilidades maiores que 1 ou se todos são iguais a zero.
+* * Define um dicionário de problemas
+* * Verifica se existe probabilidades p maiores que 1.
+* * * Pula os fatores de ajuste de mortalidade - PRECISA REVISAR E ENTENDER BEM DO QUE SE TRATA
+* * * Se existir algum elemento em alguma coluna maior que 0.99
+* * * * Salva o benefício e uma tabela com os valores maiores que 0.99, tirando valores NA
+* * * * Corrige as probabilidades onde for necessário
+* * * Verifica se todos os valores são zero
+* * * Verifica se existe algum elemento em alguma coluna com valor negativo
+* * * * Salva os valores negativos no dicionário de problemas
+* * * * Corrige e salva como probabilidade 0
+
+##### util.graficos * (importa tudo)
+* Cria gráficos com os resultados. Usa a biblioteca matplotlib, usando o pacote pyplot e o pacote numpy.
+* Define o diretório resultados como local de salvamento dos gráficos
+
+##### util.carrega_parametros obter_parametros
+* Cria um dicionário de parâmetros - parametros
+* Abre o arquivo de texto parametros.txt
+* Pula as linhas e pega os valores do arquivo.
+
+##### import modelos.fazenda as fz - importa os modelos da fazenda como fz
+* Os modelos importam as funções de cálculo de cada um dos elementos:
+* * modelos.modulos_fazenda.probabilidades  - 
+* * modelos.modulos_fazenda.demografia  - 
+* * modelos.modulos_fazenda.taxas  - 
+* * modelos.modulos_fazenda.estoques  - 
+* * modelos.modulos_fazenda.salarios  - 
+* * modelos.modulos_fazenda.receitas  - 
+* * modelos.modulos_fazenda.depesas  - 
+* * modelos.modulos_fazenda.valorBeneficios  - 
+* * modelos.modulos_fazenda.resultados  - 
+
+
+##### Probabilidade de entrar na aposentadoria 
+Separa-se a parcela da popula��o em diversos segmentos
+* calc_prob_apos_MF(segurados, concessoes, periodo):
+* * Obt�m-se as chaves de homens urbanos. Ap�s isso, a probabilidade de entrada � obtida com:
+* * * prob_entrada = concessoes/PopOcupada
+* * A fun��o faz um tratamento dos dados e assume que as probabilidades de 2015 para frente s�o as mesmas
+
+# Calcula probabilidades de entrada em aposentadorias baseado na Equa��o 16 da lDO de 2018
+* calc_prob_apos_LDO2018(segurados, concessoes, periodo):
+* * Cria a probabilidade de entrada como concessoes/segurados + segurados/2
+* * Repete os dados de 2014 para todos os anos
+
+# Calcula probabilidades de entrada em aux�lios baseado nas planilhas do DOC110/MF
+* calc_prob_aux_MF(segurados, estoques, concessoes, periodo)
+* * De acordo com as planilhas do  DOC110/MF
+* * * ProbAuxDoenca = Concedidos/popOcupada
+* * * ProbAuxAcidente = Estoque/popOcupada
+* * * ProbAuxReclus�o = Estoque/popOcupada(somando a idade com 25)
+
+# Calcula probabilidades de entrada em aux�lios - Equa��es 18 e 19 da LDO de 2018
+* calc_prob_aux_LDO2018(segurados, estoques, concessoes, periodo):
