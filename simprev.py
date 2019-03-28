@@ -162,7 +162,7 @@ segurados = fz.calc_demografia(populacao, taxas)
 # Calcula as probabilidades de entrada em benefício e morte
 print('Calculando probabilidades ...\n')
 probabilidades = fz.calc_probabilidades(populacao, segurados, estoques,
-                                     concessoes, cessacoes, periodo)
+                                     concessoes, cessacoes, periodo, dadosArgumentos)
 
 # Buscar por erros nas probababilidades
 busca_erros_prob(probabilidades, logs, corrigir=False)
